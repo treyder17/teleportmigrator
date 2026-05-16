@@ -1,0 +1,91 @@
+type WizardStep = nat;
+type TransferJob = 
+ record {
+   createdAt: Timestamp;
+   id: JobId;
+   items: vec ItemProgress;
+   sessionId: SessionId;
+   status: JobStatus;
+   updatedAt: Timestamp;
+ };
+type Timestamp = int;
+type SessionId = text;
+type Session = 
+ record {
+   accountA: AuthState;
+   accountB: AuthState;
+   createdAt: Timestamp;
+   id: SessionId;
+   step: WizardStep;
+   updatedAt: Timestamp;
+ };
+type LogEntry = 
+ record {
+   endTime: opt Timestamp;
+   errorMessage: opt text;
+   itemId: ItemId;
+   itemName: text;
+   itemType: ItemType;
+   startTime: Timestamp;
+   status: JobStatus;
+ };
+type JobStatus = 
+ variant {
+   complete;
+   failed;
+   pending;
+   running;
+ };
+type JobId = text;
+type ItemType = 
+ variant {
+   bot;
+   channel;
+   chat;
+   folder;
+   group;
+ };
+type ItemProgress = 
+ record {
+   errorMessage: opt text;
+   itemId: ItemId;
+   itemName: text;
+   itemType: ItemType;
+   progressPct: nat;
+   status: JobStatus;
+ };
+type ItemId = text;
+type AuthState = 
+ record {
+   phone: text;
+   sessionString: text;
+   verified: bool;
+ };
+type AccountItem = 
+ record {
+   id: ItemId;
+   itemType: ItemType;
+   memberCount: nat;
+   name: text;
+   selected: bool;
+   subscriberCount: nat;
+ };
+service : {
+  addLogEntry: (sessionId: SessionId, entry: LogEntry) -> ();
+  createSession: () -> (SessionId);
+  createTransferJob: (sessionId: SessionId) -> (opt JobId);
+  getScannedItems: (sessionId: SessionId) -> (vec AccountItem) query;
+  getSession: (sessionId: SessionId) -> (opt Session) query;
+  getTransferJob: (jobId: JobId) -> (opt TransferJob) query;
+  getTransferLogs: (sessionId: SessionId) -> (vec LogEntry) query;
+  listTransferJobs: (sessionId: SessionId) -> (vec TransferJob) query;
+  scanAccountA: (sessionId: SessionId) -> (vec AccountItem);
+  selectAllItems: (sessionId: SessionId, selected: bool) -> (bool);
+  setAccountAAuth: (sessionId: SessionId, auth: AuthState) -> (bool);
+  setAccountBAuth: (sessionId: SessionId, auth: AuthState) -> (bool);
+  setWizardStep: (sessionId: SessionId, step: WizardStep) -> (bool);
+  toggleItemSelection: (sessionId: SessionId, itemId: ItemId) -> (bool);
+  updateItemProgress: (jobId: JobId, itemId: ItemId, status: JobStatus,
+   progressPct: nat, errorMessage: opt text) -> (bool);
+  updateJobStatus: (jobId: JobId, status: JobStatus) -> (bool);
+}

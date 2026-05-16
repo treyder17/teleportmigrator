@@ -1,0 +1,130 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-display: "Space Grotesk";
+    --font-body: "DM Sans";
+    --font-mono: "Geist Mono", "JetBrains Mono", monospace;
+    --radius: 0.5rem;
+
+    --background: 0.99 0 0;
+    --foreground: 0.15 0 0;
+    --card: 1.0 0 0;
+    --card-foreground: 0.15 0 0;
+    --popover: 1.0 0 0;
+    --popover-foreground: 0.15 0 0;
+
+    --primary: 0.75 0.15 200;
+    --primary-foreground: 0.98 0 0;
+
+    --secondary: 0.95 0 0;
+    --secondary-foreground: 0.25 0 0;
+    --muted: 0.95 0 0;
+    --muted-foreground: 0.5 0 0;
+
+    --accent: 0.75 0.15 200;
+    --accent-foreground: 0.98 0 0;
+
+    --destructive: 0.55 0.22 25;
+    --destructive-foreground: 0.98 0 0;
+
+    --border: 0.9 0 0;
+    --input: 0.9 0 0;
+    --ring: 0.75 0.15 200;
+
+    --chart-1: 0.65 0.22 40;
+    --chart-2: 0.6 0.12 185;
+    --chart-3: 0.4 0.07 227;
+    --chart-4: 0.83 0.19 84;
+    --chart-5: 0.77 0.19 70;
+
+    --sidebar: 0.98 0 0;
+    --sidebar-foreground: 0.15 0 0;
+    --sidebar-primary: 0.75 0.15 200;
+    --sidebar-primary-foreground: 0.98 0 0;
+    --sidebar-accent: 0.95 0 0;
+    --sidebar-accent-foreground: 0.25 0 0;
+    --sidebar-border: 0.9 0 0;
+    --sidebar-ring: 0.75 0.15 200;
+  }
+
+  .dark {
+    --background: 0.12 0.005 220;
+    --foreground: 0.93 0.01 210;
+    --card: 0.16 0.008 215;
+    --card-foreground: 0.93 0.01 210;
+    --popover: 0.19 0.008 215;
+    --popover-foreground: 0.93 0.01 210;
+
+    --primary: 0.75 0.15 200;
+    --primary-foreground: 0.1 0.02 220;
+
+    --secondary: 0.2 0.01 215;
+    --secondary-foreground: 0.82 0.01 210;
+    --muted: 0.19 0.008 215;
+    --muted-foreground: 0.52 0.02 210;
+
+    --accent: 0.75 0.15 200;
+    --accent-foreground: 0.1 0.02 220;
+
+    --destructive: 0.62 0.21 22;
+    --destructive-foreground: 0.98 0 0;
+
+    --border: 0.24 0.01 215;
+    --input: 0.22 0.01 215;
+    --ring: 0.75 0.15 200;
+
+    --chart-1: 0.75 0.15 200;
+    --chart-2: 0.7 0.17 162;
+    --chart-3: 0.77 0.19 70;
+    --chart-4: 0.63 0.27 304;
+    --chart-5: 0.65 0.25 16;
+
+    --sidebar: 0.14 0.006 218;
+    --sidebar-foreground: 0.9 0.01 210;
+    --sidebar-primary: 0.75 0.15 200;
+    --sidebar-primary-foreground: 0.1 0.02 220;
+    --sidebar-accent: 0.19 0.008 215;
+    --sidebar-accent-foreground: 0.82 0.01 210;
+    --sidebar-border: 0.21 0.01 215;
+    --sidebar-ring: 0.75 0.15 200;
+  }
+
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+  }
+}
+
+@layer utilities {
+  .transition-smooth {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+html {
+  color-scheme: dark;
+}
+
+.shadow-subtle {
+  box-shadow: 0 1px 3px 0 oklch(0 0 0 / 0.4), 0 1px 2px -1px oklch(0 0 0 / 0.2);
+}
+
+.shadow-elevated {
+  box-shadow: 0 4px 16px 0 oklch(0 0 0 / 0.5), 0 2px 6px -2px oklch(0 0 0 / 0.3);
+}
+
+.glow-primary {
+  box-shadow: 0 0 0 1px oklch(0.75 0.15 200 / 0.3), 0 0 16px
+    oklch(0.75 0.15 200 / 0.15);
+}
+
+.transition-colors-fast {
+  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s
+    ease;
+}

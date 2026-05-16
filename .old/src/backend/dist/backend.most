@@ -1,0 +1,91 @@
+// Version: 1.0.0
+type AccountItem__98192628 =
+  {
+    id : ItemId__833640393;
+    itemType : ItemType__245035548;
+    memberCount : Nat;
+    name : Text;
+    selected : Bool;
+    subscriberCount : Nat
+  };
+type AuthState__271089540 =
+  {phone : Text; sessionString : Text; verified : Bool};
+type Data__791452850<K, V> =
+  {var count : Nat__490723111; kvs : [var ?(K, V)]};
+type Internal__8484328<K, V> =
+  {children : [var ?Node__46230540<K, V>]; data : Data__791452850<K, V>};
+type ItemId__833640393 = Text;
+type ItemProgress__923463041 =
+  {
+    errorMessage : ?Text;
+    itemId : ItemId__833640393;
+    itemName : Text;
+    itemType : ItemType__245035548;
+    progressPct : Nat;
+    status : JobStatus__357834694
+  };
+type ItemType__245035548 = {#bot; #channel; #chat; #folder; #group};
+type JobId__339598917 = Text;
+type JobStatus__357834694 = {#complete; #failed; #pending; #running};
+type Leaf__809889148<K, V> = {data : Data__791452850<K, V>};
+type LogEntry__1255661 =
+  {
+    endTime : ?Timestamp__301639476;
+    errorMessage : ?Text;
+    itemId : ItemId__833640393;
+    itemName : Text;
+    itemType : ItemType__245035548;
+    startTime : Timestamp__301639476;
+    status : JobStatus__357834694
+  };
+type Nat__490723111 = Nat__920180692;
+type Nat__920180692 = Nat;
+type Node__46230540<K, V> =
+  {#internal : Internal__8484328<K, V>; #leaf : Leaf__809889148<K, V>};
+type SessionId__1052913375 = Text;
+type SessionInternal__201933494 =
+  {
+    var accountA : AuthState__271089540;
+    var accountB : AuthState__271089540;
+    createdAt : Timestamp__301639476;
+    id : SessionId__1052913375;
+    var step : WizardStep__424262630;
+    var updatedAt : Timestamp__301639476
+  };
+type Timestamp__301639476 = Int;
+type TransferJobInternal__860804892 =
+  {
+    createdAt : Timestamp__301639476;
+    id : JobId__339598917;
+    var items : [ItemProgress__923463041];
+    sessionId : SessionId__1052913375;
+    var status : JobStatus__357834694;
+    var updatedAt : Timestamp__301639476
+  };
+type WizardStep__424262630 = Nat;
+actor {
+  stable jobs :
+    {
+      var root :
+        Node__46230540<JobId__339598917, TransferJobInternal__860804892>;
+      var size : Nat__490723111
+    };
+  stable logs :
+    {
+      var root : Node__46230540<SessionId__1052913375, [LogEntry__1255661]>;
+      var size : Nat__490723111
+    };
+  stable scannedItems :
+    {
+      var root :
+        Node__46230540<SessionId__1052913375, [AccountItem__98192628]>;
+      var size : Nat__490723111
+    };
+  stable sessions :
+    {
+      var root :
+        Node__46230540<SessionId__1052913375, SessionInternal__201933494>;
+      var size : Nat__490723111
+    };
+  stable state : {var nextJobId : Nat; var nextSessionId : Nat}
+};

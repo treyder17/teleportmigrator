@@ -1,0 +1,21 @@
+{
+  "overview": "A professional Telegram account migration dashboard with a full step-by-step wizard. Log in two accounts, scan all chats, channels, groups, folders and bots, preview what will transfer, then watch the migration happen live with real-time progress tracking.",
+  "features": [
+    "5-step migration wizard (Auth → Scan → Preview → Execute → Done)",
+    "Dual-account authentication with phone number, verification code, and QR code flows",
+    "Account scanner showing all chats, channels, groups, folders, and bots with realistic mock data",
+    "Transfer preview with per-item strategy display (auto-join vs replicate)",
+    "Live transfer progress bars, status log, and migration summary",
+    "Persistent sessions and transfer jobs stored in backend",
+    "Dark professional dashboard with sidebar navigation"
+  ],
+  "category": "productivity",
+  "tags": [
+    "telegram",
+    "migration",
+    "dashboard",
+    "wizard",
+    "productivity"
+  ],
+  "last_updated": "2026-05-14T10:08:31.378Z"
+}
