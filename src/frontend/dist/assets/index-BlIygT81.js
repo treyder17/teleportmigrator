@@ -27653,6 +27653,660 @@ function WizardProvider({ children }) {
     }
   );
 }
+const SessionId = Text;
+const Timestamp = Int;
+const JobStatus = Variant({
+  "pending": Null,
+  "complete": Null,
+  "failed": Null,
+  "running": Null
+});
+const ItemId = Text;
+const ItemType = Variant({
+  "bot": Null,
+  "chat": Null,
+  "group": Null,
+  "channel": Null,
+  "folder": Null
+});
+const LogEntry = Record({
+  "startTime": Timestamp,
+  "status": JobStatus,
+  "itemId": ItemId,
+  "endTime": Opt(Timestamp),
+  "errorMessage": Opt(Text),
+  "itemName": Text,
+  "itemType": ItemType
+});
+const JobId = Text;
+const AccountItem = Record({
+  "id": ItemId,
+  "name": Text,
+  "memberCount": Nat,
+  "itemType": ItemType,
+  "selected": Bool,
+  "subscriberCount": Nat
+});
+const WizardStep = Nat;
+const AuthState = Record({
+  "sessionString": Text,
+  "verified": Bool,
+  "phone": Text
+});
+const Session = Record({
+  "id": SessionId,
+  "createdAt": Timestamp,
+  "step": WizardStep,
+  "updatedAt": Timestamp,
+  "accountA": AuthState,
+  "accountB": AuthState
+});
+const ItemProgress = Record({
+  "status": JobStatus,
+  "itemId": ItemId,
+  "errorMessage": Opt(Text),
+  "itemName": Text,
+  "itemType": ItemType,
+  "progressPct": Nat
+});
+const TransferJob = Record({
+  "id": JobId,
+  "status": JobStatus,
+  "createdAt": Timestamp,
+  "updatedAt": Timestamp,
+  "sessionId": SessionId,
+  "items": Vec(ItemProgress)
+});
+Service({
+  "addLogEntry": Func([SessionId, LogEntry], [], []),
+  "createSession": Func([], [SessionId], []),
+  "createTransferJob": Func([SessionId], [Opt(JobId)], []),
+  "getScannedItems": Func([SessionId], [Vec(AccountItem)], ["query"]),
+  "getSession": Func([SessionId], [Opt(Session)], ["query"]),
+  "getTransferJob": Func([JobId], [Opt(TransferJob)], ["query"]),
+  "getTransferLogs": Func([SessionId], [Vec(LogEntry)], ["query"]),
+  "listTransferJobs": Func([SessionId], [Vec(TransferJob)], ["query"]),
+  "scanAccountA": Func([SessionId], [Vec(AccountItem)], []),
+  "selectAllItems": Func([SessionId, Bool], [Bool], []),
+  "sendCode": Func(
+    [SessionId, Text, Text],
+    [Variant({ "ok": Null, "err": Text })],
+    []
+  ),
+  "setAccountAAuth": Func([SessionId, AuthState], [Bool], []),
+  "setAccountBAuth": Func([SessionId, AuthState], [Bool], []),
+  "setWizardStep": Func([SessionId, WizardStep], [Bool], []),
+  "toggleItemSelection": Func([SessionId, ItemId], [Bool], []),
+  "updateItemProgress": Func(
+    [JobId, ItemId, JobStatus, Nat, Opt(Text)],
+    [Bool],
+    []
+  ),
+  "updateJobStatus": Func([JobId, JobStatus], [Bool], []),
+  "verifyCode": Func(
+    [SessionId, Text, Text, Text],
+    [
+      Variant({
+        "ok": Record({ "username": Text, "initials": Text }),
+        "err": Text
+      })
+    ],
+    []
+  )
+});
+const idlFactory = ({ IDL: IDL2 }) => {
+  const SessionId2 = IDL2.Text;
+  const Timestamp2 = IDL2.Int;
+  const JobStatus2 = IDL2.Variant({
+    "pending": IDL2.Null,
+    "complete": IDL2.Null,
+    "failed": IDL2.Null,
+    "running": IDL2.Null
+  });
+  const ItemId2 = IDL2.Text;
+  const ItemType2 = IDL2.Variant({
+    "bot": IDL2.Null,
+    "chat": IDL2.Null,
+    "group": IDL2.Null,
+    "channel": IDL2.Null,
+    "folder": IDL2.Null
+  });
+  const LogEntry2 = IDL2.Record({
+    "startTime": Timestamp2,
+    "status": JobStatus2,
+    "itemId": ItemId2,
+    "endTime": IDL2.Opt(Timestamp2),
+    "errorMessage": IDL2.Opt(IDL2.Text),
+    "itemName": IDL2.Text,
+    "itemType": ItemType2
+  });
+  const JobId2 = IDL2.Text;
+  const AccountItem2 = IDL2.Record({
+    "id": ItemId2,
+    "name": IDL2.Text,
+    "memberCount": IDL2.Nat,
+    "itemType": ItemType2,
+    "selected": IDL2.Bool,
+    "subscriberCount": IDL2.Nat
+  });
+  const WizardStep2 = IDL2.Nat;
+  const AuthState2 = IDL2.Record({
+    "sessionString": IDL2.Text,
+    "verified": IDL2.Bool,
+    "phone": IDL2.Text
+  });
+  const Session2 = IDL2.Record({
+    "id": SessionId2,
+    "createdAt": Timestamp2,
+    "step": WizardStep2,
+    "updatedAt": Timestamp2,
+    "accountA": AuthState2,
+    "accountB": AuthState2
+  });
+  const ItemProgress2 = IDL2.Record({
+    "status": JobStatus2,
+    "itemId": ItemId2,
+    "errorMessage": IDL2.Opt(IDL2.Text),
+    "itemName": IDL2.Text,
+    "itemType": ItemType2,
+    "progressPct": IDL2.Nat
+  });
+  const TransferJob2 = IDL2.Record({
+    "id": JobId2,
+    "status": JobStatus2,
+    "createdAt": Timestamp2,
+    "updatedAt": Timestamp2,
+    "sessionId": SessionId2,
+    "items": IDL2.Vec(ItemProgress2)
+  });
+  return IDL2.Service({
+    "addLogEntry": IDL2.Func([SessionId2, LogEntry2], [], []),
+    "createSession": IDL2.Func([], [SessionId2], []),
+    "createTransferJob": IDL2.Func([SessionId2], [IDL2.Opt(JobId2)], []),
+    "getScannedItems": IDL2.Func(
+      [SessionId2],
+      [IDL2.Vec(AccountItem2)],
+      ["query"]
+    ),
+    "getSession": IDL2.Func([SessionId2], [IDL2.Opt(Session2)], ["query"]),
+    "getTransferJob": IDL2.Func([JobId2], [IDL2.Opt(TransferJob2)], ["query"]),
+    "getTransferLogs": IDL2.Func([SessionId2], [IDL2.Vec(LogEntry2)], ["query"]),
+    "listTransferJobs": IDL2.Func(
+      [SessionId2],
+      [IDL2.Vec(TransferJob2)],
+      ["query"]
+    ),
+    "scanAccountA": IDL2.Func([SessionId2], [IDL2.Vec(AccountItem2)], []),
+    "selectAllItems": IDL2.Func([SessionId2, IDL2.Bool], [IDL2.Bool], []),
+    "sendCode": IDL2.Func(
+      [SessionId2, IDL2.Text, IDL2.Text],
+      [IDL2.Variant({ "ok": IDL2.Null, "err": IDL2.Text })],
+      []
+    ),
+    "setAccountAAuth": IDL2.Func([SessionId2, AuthState2], [IDL2.Bool], []),
+    "setAccountBAuth": IDL2.Func([SessionId2, AuthState2], [IDL2.Bool], []),
+    "setWizardStep": IDL2.Func([SessionId2, WizardStep2], [IDL2.Bool], []),
+    "toggleItemSelection": IDL2.Func([SessionId2, ItemId2], [IDL2.Bool], []),
+    "updateItemProgress": IDL2.Func(
+      [JobId2, ItemId2, JobStatus2, IDL2.Nat, IDL2.Opt(IDL2.Text)],
+      [IDL2.Bool],
+      []
+    ),
+    "updateJobStatus": IDL2.Func([JobId2, JobStatus2], [IDL2.Bool], []),
+    "verifyCode": IDL2.Func(
+      [SessionId2, IDL2.Text, IDL2.Text, IDL2.Text],
+      [
+        IDL2.Variant({
+          "ok": IDL2.Record({ "username": IDL2.Text, "initials": IDL2.Text }),
+          "err": IDL2.Text
+        })
+      ],
+      []
+    )
+  });
+};
+function candid_some(value) {
+  return [
+    value
+  ];
+}
+function candid_none() {
+  return [];
+}
+function record_opt_to_undefined(arg) {
+  return arg == null ? void 0 : arg;
+}
+class Backend {
+  constructor(actor, _uploadFile, _downloadFile, processError2) {
+    this.actor = actor;
+    this._uploadFile = _uploadFile;
+    this._downloadFile = _downloadFile;
+    this.processError = processError2;
+  }
+  async addLogEntry(arg0, arg1) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.addLogEntry(arg0, to_candid_LogEntry_n1(this._uploadFile, this._downloadFile, arg1));
+        return result;
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.addLogEntry(arg0, to_candid_LogEntry_n1(this._uploadFile, this._downloadFile, arg1));
+      return result;
+    }
+  }
+  async createSession() {
+    if (this.processError) {
+      try {
+        const result = await this.actor.createSession();
+        return result;
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.createSession();
+      return result;
+    }
+  }
+  async createTransferJob(arg0) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.createTransferJob(arg0);
+        return from_candid_opt_n7(this._uploadFile, this._downloadFile, result);
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.createTransferJob(arg0);
+      return from_candid_opt_n7(this._uploadFile, this._downloadFile, result);
+    }
+  }
+  async getScannedItems(arg0) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.getScannedItems(arg0);
+        return from_candid_vec_n8(this._uploadFile, this._downloadFile, result);
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.getScannedItems(arg0);
+      return from_candid_vec_n8(this._uploadFile, this._downloadFile, result);
+    }
+  }
+  async getSession(arg0) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.getSession(arg0);
+        return from_candid_opt_n13(this._uploadFile, this._downloadFile, result);
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.getSession(arg0);
+      return from_candid_opt_n13(this._uploadFile, this._downloadFile, result);
+    }
+  }
+  async getTransferJob(arg0) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.getTransferJob(arg0);
+        return from_candid_opt_n14(this._uploadFile, this._downloadFile, result);
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.getTransferJob(arg0);
+      return from_candid_opt_n14(this._uploadFile, this._downloadFile, result);
+    }
+  }
+  async getTransferLogs(arg0) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.getTransferLogs(arg0);
+        return from_candid_vec_n23(this._uploadFile, this._downloadFile, result);
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.getTransferLogs(arg0);
+      return from_candid_vec_n23(this._uploadFile, this._downloadFile, result);
+    }
+  }
+  async listTransferJobs(arg0) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.listTransferJobs(arg0);
+        return from_candid_vec_n27(this._uploadFile, this._downloadFile, result);
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.listTransferJobs(arg0);
+      return from_candid_vec_n27(this._uploadFile, this._downloadFile, result);
+    }
+  }
+  async scanAccountA(arg0) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.scanAccountA(arg0);
+        return from_candid_vec_n8(this._uploadFile, this._downloadFile, result);
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.scanAccountA(arg0);
+      return from_candid_vec_n8(this._uploadFile, this._downloadFile, result);
+    }
+  }
+  async selectAllItems(arg0, arg1) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.selectAllItems(arg0, arg1);
+        return result;
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.selectAllItems(arg0, arg1);
+      return result;
+    }
+  }
+  async sendCode(arg0, arg1, arg2) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.sendCode(arg0, arg1, arg2);
+        return from_candid_variant_n28(this._uploadFile, this._downloadFile, result);
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.sendCode(arg0, arg1, arg2);
+      return from_candid_variant_n28(this._uploadFile, this._downloadFile, result);
+    }
+  }
+  async setAccountAAuth(arg0, arg1) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.setAccountAAuth(arg0, arg1);
+        return result;
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.setAccountAAuth(arg0, arg1);
+      return result;
+    }
+  }
+  async setAccountBAuth(arg0, arg1) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.setAccountBAuth(arg0, arg1);
+        return result;
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.setAccountBAuth(arg0, arg1);
+      return result;
+    }
+  }
+  async setWizardStep(arg0, arg1) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.setWizardStep(arg0, arg1);
+        return result;
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.setWizardStep(arg0, arg1);
+      return result;
+    }
+  }
+  async toggleItemSelection(arg0, arg1) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.toggleItemSelection(arg0, arg1);
+        return result;
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.toggleItemSelection(arg0, arg1);
+      return result;
+    }
+  }
+  async updateItemProgress(arg0, arg1, arg2, arg3, arg4) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.updateItemProgress(arg0, arg1, to_candid_JobStatus_n3(this._uploadFile, this._downloadFile, arg2), arg3, to_candid_opt_n29(this._uploadFile, this._downloadFile, arg4));
+        return result;
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.updateItemProgress(arg0, arg1, to_candid_JobStatus_n3(this._uploadFile, this._downloadFile, arg2), arg3, to_candid_opt_n29(this._uploadFile, this._downloadFile, arg4));
+      return result;
+    }
+  }
+  async updateJobStatus(arg0, arg1) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.updateJobStatus(arg0, to_candid_JobStatus_n3(this._uploadFile, this._downloadFile, arg1));
+        return result;
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.updateJobStatus(arg0, to_candid_JobStatus_n3(this._uploadFile, this._downloadFile, arg1));
+      return result;
+    }
+  }
+  async verifyCode(arg0, arg1, arg2, arg3) {
+    if (this.processError) {
+      try {
+        const result = await this.actor.verifyCode(arg0, arg1, arg2, arg3);
+        return from_candid_variant_n30(this._uploadFile, this._downloadFile, result);
+      } catch (e) {
+        this.processError(e);
+        throw new Error("unreachable");
+      }
+    } else {
+      const result = await this.actor.verifyCode(arg0, arg1, arg2, arg3);
+      return from_candid_variant_n30(this._uploadFile, this._downloadFile, result);
+    }
+  }
+}
+function from_candid_AccountItem_n9(_uploadFile, _downloadFile, value) {
+  return from_candid_record_n10(_uploadFile, _downloadFile, value);
+}
+function from_candid_ItemProgress_n20(_uploadFile, _downloadFile, value) {
+  return from_candid_record_n21(_uploadFile, _downloadFile, value);
+}
+function from_candid_ItemType_n11(_uploadFile, _downloadFile, value) {
+  return from_candid_variant_n12(_uploadFile, _downloadFile, value);
+}
+function from_candid_JobStatus_n17(_uploadFile, _downloadFile, value) {
+  return from_candid_variant_n18(_uploadFile, _downloadFile, value);
+}
+function from_candid_LogEntry_n24(_uploadFile, _downloadFile, value) {
+  return from_candid_record_n25(_uploadFile, _downloadFile, value);
+}
+function from_candid_TransferJob_n15(_uploadFile, _downloadFile, value) {
+  return from_candid_record_n16(_uploadFile, _downloadFile, value);
+}
+function from_candid_opt_n13(_uploadFile, _downloadFile, value) {
+  return value.length === 0 ? null : value[0];
+}
+function from_candid_opt_n14(_uploadFile, _downloadFile, value) {
+  return value.length === 0 ? null : from_candid_TransferJob_n15(_uploadFile, _downloadFile, value[0]);
+}
+function from_candid_opt_n22(_uploadFile, _downloadFile, value) {
+  return value.length === 0 ? null : value[0];
+}
+function from_candid_opt_n26(_uploadFile, _downloadFile, value) {
+  return value.length === 0 ? null : value[0];
+}
+function from_candid_opt_n7(_uploadFile, _downloadFile, value) {
+  return value.length === 0 ? null : value[0];
+}
+function from_candid_record_n10(_uploadFile, _downloadFile, value) {
+  return {
+    id: value.id,
+    name: value.name,
+    memberCount: value.memberCount,
+    itemType: from_candid_ItemType_n11(_uploadFile, _downloadFile, value.itemType),
+    selected: value.selected,
+    subscriberCount: value.subscriberCount
+  };
+}
+function from_candid_record_n16(_uploadFile, _downloadFile, value) {
+  return {
+    id: value.id,
+    status: from_candid_JobStatus_n17(_uploadFile, _downloadFile, value.status),
+    createdAt: value.createdAt,
+    updatedAt: value.updatedAt,
+    sessionId: value.sessionId,
+    items: from_candid_vec_n19(_uploadFile, _downloadFile, value.items)
+  };
+}
+function from_candid_record_n21(_uploadFile, _downloadFile, value) {
+  return {
+    status: from_candid_JobStatus_n17(_uploadFile, _downloadFile, value.status),
+    itemId: value.itemId,
+    errorMessage: record_opt_to_undefined(from_candid_opt_n22(_uploadFile, _downloadFile, value.errorMessage)),
+    itemName: value.itemName,
+    itemType: from_candid_ItemType_n11(_uploadFile, _downloadFile, value.itemType),
+    progressPct: value.progressPct
+  };
+}
+function from_candid_record_n25(_uploadFile, _downloadFile, value) {
+  return {
+    startTime: value.startTime,
+    status: from_candid_JobStatus_n17(_uploadFile, _downloadFile, value.status),
+    itemId: value.itemId,
+    endTime: record_opt_to_undefined(from_candid_opt_n26(_uploadFile, _downloadFile, value.endTime)),
+    errorMessage: record_opt_to_undefined(from_candid_opt_n22(_uploadFile, _downloadFile, value.errorMessage)),
+    itemName: value.itemName,
+    itemType: from_candid_ItemType_n11(_uploadFile, _downloadFile, value.itemType)
+  };
+}
+function from_candid_variant_n12(_uploadFile, _downloadFile, value) {
+  return "bot" in value ? "bot" : "chat" in value ? "chat" : "group" in value ? "group" : "channel" in value ? "channel" : "folder" in value ? "folder" : value;
+}
+function from_candid_variant_n18(_uploadFile, _downloadFile, value) {
+  return "pending" in value ? "pending" : "complete" in value ? "complete" : "failed" in value ? "failed" : "running" in value ? "running" : value;
+}
+function from_candid_variant_n28(_uploadFile, _downloadFile, value) {
+  return "ok" in value ? {
+    __kind__: "ok",
+    ok: value.ok
+  } : "err" in value ? {
+    __kind__: "err",
+    err: value.err
+  } : value;
+}
+function from_candid_variant_n30(_uploadFile, _downloadFile, value) {
+  return "ok" in value ? {
+    __kind__: "ok",
+    ok: value.ok
+  } : "err" in value ? {
+    __kind__: "err",
+    err: value.err
+  } : value;
+}
+function from_candid_vec_n19(_uploadFile, _downloadFile, value) {
+  return value.map((x3) => from_candid_ItemProgress_n20(_uploadFile, _downloadFile, x3));
+}
+function from_candid_vec_n23(_uploadFile, _downloadFile, value) {
+  return value.map((x3) => from_candid_LogEntry_n24(_uploadFile, _downloadFile, x3));
+}
+function from_candid_vec_n27(_uploadFile, _downloadFile, value) {
+  return value.map((x3) => from_candid_TransferJob_n15(_uploadFile, _downloadFile, x3));
+}
+function from_candid_vec_n8(_uploadFile, _downloadFile, value) {
+  return value.map((x3) => from_candid_AccountItem_n9(_uploadFile, _downloadFile, x3));
+}
+function to_candid_ItemType_n5(_uploadFile, _downloadFile, value) {
+  return to_candid_variant_n6(_uploadFile, _downloadFile, value);
+}
+function to_candid_JobStatus_n3(_uploadFile, _downloadFile, value) {
+  return to_candid_variant_n4(_uploadFile, _downloadFile, value);
+}
+function to_candid_LogEntry_n1(_uploadFile, _downloadFile, value) {
+  return to_candid_record_n2(_uploadFile, _downloadFile, value);
+}
+function to_candid_opt_n29(_uploadFile, _downloadFile, value) {
+  return value === null ? candid_none() : candid_some(value);
+}
+function to_candid_record_n2(_uploadFile, _downloadFile, value) {
+  return {
+    startTime: value.startTime,
+    status: to_candid_JobStatus_n3(_uploadFile, _downloadFile, value.status),
+    itemId: value.itemId,
+    endTime: value.endTime ? candid_some(value.endTime) : candid_none(),
+    errorMessage: value.errorMessage ? candid_some(value.errorMessage) : candid_none(),
+    itemName: value.itemName,
+    itemType: to_candid_ItemType_n5(_uploadFile, _downloadFile, value.itemType)
+  };
+}
+function to_candid_variant_n4(_uploadFile, _downloadFile, value) {
+  return value == "pending" ? {
+    pending: null
+  } : value == "complete" ? {
+    complete: null
+  } : value == "failed" ? {
+    failed: null
+  } : value == "running" ? {
+    running: null
+  } : value;
+}
+function to_candid_variant_n6(_uploadFile, _downloadFile, value) {
+  return value == "bot" ? {
+    bot: null
+  } : value == "chat" ? {
+    chat: null
+  } : value == "group" ? {
+    group: null
+  } : value == "channel" ? {
+    channel: null
+  } : value == "folder" ? {
+    folder: null
+  } : value;
+}
+function createActor(canisterId, _uploadFile, _downloadFile, options = {}) {
+  const agent = options.agent || HttpAgent.createSync({
+    ...options.agentOptions
+  });
+  if (options.agent && options.agentOptions) {
+    console.warn("Detected both agent and agentOptions passed to createActor. Ignoring agentOptions and proceeding with the provided agent.");
+  }
+  const actor = Actor.createActor(idlFactory, {
+    agent,
+    canisterId,
+    ...options.actorOptions
+  });
+  return new Backend(actor, _uploadFile, _downloadFile, options.processError);
+}
 const WIZARD_STEPS = [
   { id: "auth", label: "Authentication", path: "/" },
   { id: "scan", label: "Account Scanner", path: "/scan" },
@@ -35980,63 +36634,6 @@ function IconBase(props) {
 function SiTelegram(props) {
   return GenIcon({ "attr": { "role": "img", "viewBox": "0 0 24 24" }, "child": [{ "tag": "path", "attr": { "d": "M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" }, "child": [] }] })(props);
 }
-const MOCK_PROFILES = {
-  A: { name: "John Doe", handle: "@johndoe" },
-  B: { name: "Jane Smith", handle: "@janesmith" }
-};
-function QrMockCanvas({ seed }) {
-  const canvasRef = reactExports.useRef(null);
-  reactExports.useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    const size = 120;
-    const cells = 20;
-    const cell = size / cells;
-    canvas.width = size;
-    canvas.height = size;
-    let hash = 0;
-    for (let i = 0; i < seed.length; i++) {
-      hash = hash * 31 + seed.charCodeAt(i) >>> 0;
-    }
-    const rand = () => {
-      hash = hash * 1664525 + 1013904223 >>> 0;
-      return hash / 4294967295;
-    };
-    ctx.fillStyle = "#0d1117";
-    ctx.fillRect(0, 0, size, size);
-    ctx.fillStyle = "#5bcefa";
-    for (let row = 0; row < cells; row++) {
-      for (let col = 0; col < cells; col++) {
-        const inTopLeft = row < 7 && col < 7;
-        const inTopRight = row < 7 && col >= cells - 7;
-        const inBottomLeft = row >= cells - 7 && col < 7;
-        let filled = false;
-        if (inTopLeft || inTopRight || inBottomLeft) {
-          const r2 = inTopLeft ? row : inTopRight ? row : row - (cells - 7);
-          const c2 = inTopLeft ? col : inTopRight ? col - (cells - 7) : col;
-          filled = r2 === 0 || r2 === 6 || c2 === 0 || c2 === 6 || r2 >= 2 && r2 <= 4 && c2 >= 2 && c2 <= 4;
-        } else {
-          filled = rand() > 0.55;
-        }
-        if (filled) {
-          ctx.fillRect(col * cell, row * cell, cell - 0.5, cell - 0.5);
-        }
-      }
-    }
-  }, [seed]);
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(
-    "canvas",
-    {
-      ref: canvasRef,
-      width: 120,
-      height: 120,
-      className: "rounded-sm",
-      style: { imageRendering: "pixelated" }
-    }
-  );
-}
 function AccountAuthForm({
   slot,
   label,
@@ -36044,58 +36641,80 @@ function AccountAuthForm({
   auth,
   onVerified
 }) {
+  const { session } = useWizard();
+  const { actor } = useActor(createActor);
   const [method, setMethod] = reactExports.useState("phone");
   const [phone, setPhone] = reactExports.useState("");
   const [code, setCode] = reactExports.useState("");
   const [step, setStep] = reactExports.useState("input");
   const [loading, setLoading] = reactExports.useState(false);
-  const [qrSeed] = reactExports.useState(() => `${slot}-${Date.now()}`);
-  const [qrExpired, setQrExpired] = reactExports.useState(false);
-  const qrTimerRef = reactExports.useRef(null);
+  const [error, setError] = reactExports.useState(null);
+  const sessionId = session.id;
   const isVerified = (auth == null ? void 0 : auth.status) === "verified";
-  const profile = MOCK_PROFILES[slot];
-  const initials = profile.name.split(" ").map((n) => n[0]).join("");
-  reactExports.useEffect(() => {
-    if (method === "qr" && !isVerified) {
-      setQrExpired(false);
-      qrTimerRef.current = setTimeout(() => setQrExpired(true), 3e4);
-    }
-    return () => {
-      if (qrTimerRef.current) clearTimeout(qrTimerRef.current);
-    };
-  }, [method, isVerified]);
+  const displayName = (auth == null ? void 0 : auth.username) ?? (auth == null ? void 0 : auth.phone) ?? "";
+  const displayInitials = (auth == null ? void 0 : auth.initials) ?? (displayName ? displayName.slice(0, 2).toUpperCase() : slot);
   const handleSendCode = async () => {
     if (!phone.trim()) {
       ue.error("Enter a phone number");
       return;
     }
+    if (!actor) {
+      ue.error("Backend not ready. Please try again.");
+      return;
+    }
     setLoading(true);
-    await new Promise((r2) => setTimeout(r2, 1200));
-    setLoading(false);
-    setStep("verify");
-    ue.success(`Code sent to ${phone}`);
+    setError(null);
+    try {
+      const res = await actor.sendCode(sessionId, phone, slot);
+      if (res.__kind__ === "err") {
+        setError(res.err);
+        ue.error(res.err);
+        return;
+      }
+      setStep("verify");
+      ue.success(`Code sent to ${phone}`);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Failed to send code";
+      setError(msg);
+      ue.error(msg);
+    } finally {
+      setLoading(false);
+    }
   };
   const handleVerify = async () => {
     if (!code.trim()) {
       ue.error("Enter the verification code");
       return;
     }
+    if (!actor) {
+      ue.error("Backend not ready. Please try again.");
+      return;
+    }
     setLoading(true);
-    await new Promise((r2) => setTimeout(r2, 1e3));
-    setLoading(false);
-    onVerified({ phone, sessionHash: crypto.randomUUID(), status: "verified" });
-    ue.success(`Account ${slot} authenticated as ${profile.name}`);
-  };
-  const handleQrLogin = async () => {
-    setLoading(true);
-    await new Promise((r2) => setTimeout(r2, 1500));
-    setLoading(false);
-    onVerified({
-      phone: profile.handle,
-      sessionHash: crypto.randomUUID(),
-      status: "verified"
-    });
-    ue.success(`Account ${slot} authenticated via QR as ${profile.name}`);
+    setError(null);
+    try {
+      const res = await actor.verifyCode(sessionId, phone, code, slot);
+      if (res.__kind__ === "err") {
+        setError(res.err);
+        ue.error(res.err);
+        return;
+      }
+      const { username, initials } = res.ok;
+      onVerified({
+        phone,
+        sessionHash: crypto.randomUUID(),
+        status: "verified",
+        username,
+        initials
+      });
+      ue.success(`Account ${slot} authenticated as ${username}`);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Verification failed";
+      setError(msg);
+      ue.error(msg);
+    } finally {
+      setLoading(false);
+    }
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(
     "div",
@@ -36147,9 +36766,9 @@ function AccountAuthForm({
             ] })
           ] }),
           isVerified ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-lg bg-primary/8 border border-primary/20 p-3 flex items-center gap-3", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-primary/20 text-primary font-display font-semibold text-sm", children: initials }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-primary/20 text-primary font-display font-semibold text-sm", children: displayInitials }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0 flex-1", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-foreground truncate", children: profile.name }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-foreground truncate", children: displayName || (auth == null ? void 0 : auth.phone) }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-muted-foreground font-mono truncate", children: auth == null ? void 0 : auth.phone })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(CircleCheck, { className: "w-5 h-5 text-primary shrink-0" })
@@ -36181,47 +36800,20 @@ function AccountAuthForm({
                 ))
               }
             ),
-            method === "qr" ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-lg bg-background border border-border p-4 flex flex-col items-center gap-3", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  "div",
-                  {
-                    className: cn(
-                      "p-2 rounded-lg border-2 transition-smooth",
-                      qrExpired ? "border-destructive/40 opacity-40" : "border-primary/30 bg-muted/20"
-                    ),
-                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(QrMockCanvas, { seed: qrSeed })
-                  }
-                ),
-                qrExpired && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute inset-0 flex flex-col items-center justify-center bg-background/80 rounded-lg", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-muted-foreground mb-2", children: "QR Expired" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                    "button",
-                    {
-                      type: "button",
-                      onClick: () => setQrExpired(false),
-                      className: "flex items-center gap-1 text-xs text-primary hover:opacity-80 transition-colors-fast",
-                      children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "w-3 h-3" }),
-                        "Refresh"
-                      ]
-                    }
-                  )
-                ] })
+            method === "qr" ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-lg bg-muted/20 border border-border p-4 flex flex-col items-center gap-3 text-center", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-10 h-10 rounded-full bg-muted flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CircleAlert, { className: "w-5 h-5 text-muted-foreground" }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-foreground", children: "QR Code Not Supported" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-muted-foreground leading-relaxed max-w-[220px]", children: "QR Code authentication is not currently supported. Please use Phone Number login instead." })
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-muted-foreground text-center max-w-[160px]", children: "Open Telegram → Settings → Devices → Scan QR" }),
-              !qrExpired && /* @__PURE__ */ jsxRuntimeExports.jsx(
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
                 "button",
                 {
                   type: "button",
-                  disabled: loading,
-                  onClick: handleQrLogin,
-                  "data-ocid": `auth.account-${slot.toLowerCase()}.qr_confirm_button`,
-                  className: cn(
-                    "w-full rounded-lg bg-primary/15 border border-primary/30 text-primary text-xs font-medium py-1.5 transition-smooth",
-                    "hover:bg-primary/25 disabled:opacity-50 disabled:cursor-not-allowed"
-                  ),
-                  children: loading ? "Authenticating…" : "Simulate QR Scan"
+                  onClick: () => setMethod("phone"),
+                  "data-ocid": `auth.account-${slot.toLowerCase()}.qr_switch_button`,
+                  className: "text-xs text-primary hover:opacity-80 transition-colors-fast underline",
+                  children: "Switch to Phone Login"
                 }
               )
             ] }) : step === "input" ? (
@@ -36258,7 +36850,11 @@ function AccountAuthForm({
                       "Sending…"
                     ] }) : "Send Verification Code"
                   }
-                )
+                ),
+                error && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-destructive flex items-center gap-1", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(CircleAlert, { className: "w-3 h-3 shrink-0" }),
+                  error
+                ] })
               ] })
             ) : (
               /* Verify code */
@@ -36308,7 +36904,11 @@ function AccountAuthForm({
                       "Verifying…"
                     ] }) : "Verify & Connect"
                   }
-                )
+                ),
+                error && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-destructive flex items-center gap-1", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(CircleAlert, { className: "w-3 h-3 shrink-0" }),
+                  error
+                ] })
               ] })
             )
           ] })
@@ -36337,6 +36937,7 @@ function AuthPage() {
       /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-muted-foreground leading-relaxed", children: "Sessions are ephemeral and never stored server-side. MTProto authentication runs client-side via your browser session." })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-2 gap-2", children: ["A", "B"].map((slot) => {
+      var _a4, _b4, _c3, _d3;
       const authState = slot === "A" ? session.accountAAuth : session.accountBAuth;
       const verified = (authState == null ? void 0 : authState.status) === "verified";
       return /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -36359,7 +36960,7 @@ function AuthPage() {
             ),
             verified ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(CircleCheck, { className: "w-3 h-3 shrink-0" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "truncate", children: MOCK_PROFILES[slot].name })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "truncate", children: slot === "A" ? ((_a4 = session.accountAAuth) == null ? void 0 : _a4.username) ?? ((_b4 = session.accountAAuth) == null ? void 0 : _b4.phone) : ((_c3 = session.accountBAuth) == null ? void 0 : _c3.username) ?? ((_d3 = session.accountBAuth) == null ? void 0 : _d3.phone) })
             ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "truncate", children: [
               "Account ",
               slot,
@@ -37208,584 +37809,6 @@ function ExecutePage() {
       }
     ) })
   ] });
-}
-const SessionId = Text;
-const Timestamp = Int;
-const JobStatus = Variant({
-  "pending": Null,
-  "complete": Null,
-  "failed": Null,
-  "running": Null
-});
-const ItemId = Text;
-const ItemType = Variant({
-  "bot": Null,
-  "chat": Null,
-  "group": Null,
-  "channel": Null,
-  "folder": Null
-});
-const LogEntry = Record({
-  "startTime": Timestamp,
-  "status": JobStatus,
-  "itemId": ItemId,
-  "endTime": Opt(Timestamp),
-  "errorMessage": Opt(Text),
-  "itemName": Text,
-  "itemType": ItemType
-});
-const JobId = Text;
-const AccountItem = Record({
-  "id": ItemId,
-  "name": Text,
-  "memberCount": Nat,
-  "itemType": ItemType,
-  "selected": Bool,
-  "subscriberCount": Nat
-});
-const WizardStep = Nat;
-const AuthState = Record({
-  "sessionString": Text,
-  "verified": Bool,
-  "phone": Text
-});
-const Session = Record({
-  "id": SessionId,
-  "createdAt": Timestamp,
-  "step": WizardStep,
-  "updatedAt": Timestamp,
-  "accountA": AuthState,
-  "accountB": AuthState
-});
-const ItemProgress = Record({
-  "status": JobStatus,
-  "itemId": ItemId,
-  "errorMessage": Opt(Text),
-  "itemName": Text,
-  "itemType": ItemType,
-  "progressPct": Nat
-});
-const TransferJob = Record({
-  "id": JobId,
-  "status": JobStatus,
-  "createdAt": Timestamp,
-  "updatedAt": Timestamp,
-  "sessionId": SessionId,
-  "items": Vec(ItemProgress)
-});
-Service({
-  "addLogEntry": Func([SessionId, LogEntry], [], []),
-  "createSession": Func([], [SessionId], []),
-  "createTransferJob": Func([SessionId], [Opt(JobId)], []),
-  "getScannedItems": Func([SessionId], [Vec(AccountItem)], ["query"]),
-  "getSession": Func([SessionId], [Opt(Session)], ["query"]),
-  "getTransferJob": Func([JobId], [Opt(TransferJob)], ["query"]),
-  "getTransferLogs": Func([SessionId], [Vec(LogEntry)], ["query"]),
-  "listTransferJobs": Func([SessionId], [Vec(TransferJob)], ["query"]),
-  "scanAccountA": Func([SessionId], [Vec(AccountItem)], []),
-  "selectAllItems": Func([SessionId, Bool], [Bool], []),
-  "setAccountAAuth": Func([SessionId, AuthState], [Bool], []),
-  "setAccountBAuth": Func([SessionId, AuthState], [Bool], []),
-  "setWizardStep": Func([SessionId, WizardStep], [Bool], []),
-  "toggleItemSelection": Func([SessionId, ItemId], [Bool], []),
-  "updateItemProgress": Func(
-    [JobId, ItemId, JobStatus, Nat, Opt(Text)],
-    [Bool],
-    []
-  ),
-  "updateJobStatus": Func([JobId, JobStatus], [Bool], [])
-});
-const idlFactory = ({ IDL: IDL2 }) => {
-  const SessionId2 = IDL2.Text;
-  const Timestamp2 = IDL2.Int;
-  const JobStatus2 = IDL2.Variant({
-    "pending": IDL2.Null,
-    "complete": IDL2.Null,
-    "failed": IDL2.Null,
-    "running": IDL2.Null
-  });
-  const ItemId2 = IDL2.Text;
-  const ItemType2 = IDL2.Variant({
-    "bot": IDL2.Null,
-    "chat": IDL2.Null,
-    "group": IDL2.Null,
-    "channel": IDL2.Null,
-    "folder": IDL2.Null
-  });
-  const LogEntry2 = IDL2.Record({
-    "startTime": Timestamp2,
-    "status": JobStatus2,
-    "itemId": ItemId2,
-    "endTime": IDL2.Opt(Timestamp2),
-    "errorMessage": IDL2.Opt(IDL2.Text),
-    "itemName": IDL2.Text,
-    "itemType": ItemType2
-  });
-  const JobId2 = IDL2.Text;
-  const AccountItem2 = IDL2.Record({
-    "id": ItemId2,
-    "name": IDL2.Text,
-    "memberCount": IDL2.Nat,
-    "itemType": ItemType2,
-    "selected": IDL2.Bool,
-    "subscriberCount": IDL2.Nat
-  });
-  const WizardStep2 = IDL2.Nat;
-  const AuthState2 = IDL2.Record({
-    "sessionString": IDL2.Text,
-    "verified": IDL2.Bool,
-    "phone": IDL2.Text
-  });
-  const Session2 = IDL2.Record({
-    "id": SessionId2,
-    "createdAt": Timestamp2,
-    "step": WizardStep2,
-    "updatedAt": Timestamp2,
-    "accountA": AuthState2,
-    "accountB": AuthState2
-  });
-  const ItemProgress2 = IDL2.Record({
-    "status": JobStatus2,
-    "itemId": ItemId2,
-    "errorMessage": IDL2.Opt(IDL2.Text),
-    "itemName": IDL2.Text,
-    "itemType": ItemType2,
-    "progressPct": IDL2.Nat
-  });
-  const TransferJob2 = IDL2.Record({
-    "id": JobId2,
-    "status": JobStatus2,
-    "createdAt": Timestamp2,
-    "updatedAt": Timestamp2,
-    "sessionId": SessionId2,
-    "items": IDL2.Vec(ItemProgress2)
-  });
-  return IDL2.Service({
-    "addLogEntry": IDL2.Func([SessionId2, LogEntry2], [], []),
-    "createSession": IDL2.Func([], [SessionId2], []),
-    "createTransferJob": IDL2.Func([SessionId2], [IDL2.Opt(JobId2)], []),
-    "getScannedItems": IDL2.Func(
-      [SessionId2],
-      [IDL2.Vec(AccountItem2)],
-      ["query"]
-    ),
-    "getSession": IDL2.Func([SessionId2], [IDL2.Opt(Session2)], ["query"]),
-    "getTransferJob": IDL2.Func([JobId2], [IDL2.Opt(TransferJob2)], ["query"]),
-    "getTransferLogs": IDL2.Func([SessionId2], [IDL2.Vec(LogEntry2)], ["query"]),
-    "listTransferJobs": IDL2.Func(
-      [SessionId2],
-      [IDL2.Vec(TransferJob2)],
-      ["query"]
-    ),
-    "scanAccountA": IDL2.Func([SessionId2], [IDL2.Vec(AccountItem2)], []),
-    "selectAllItems": IDL2.Func([SessionId2, IDL2.Bool], [IDL2.Bool], []),
-    "setAccountAAuth": IDL2.Func([SessionId2, AuthState2], [IDL2.Bool], []),
-    "setAccountBAuth": IDL2.Func([SessionId2, AuthState2], [IDL2.Bool], []),
-    "setWizardStep": IDL2.Func([SessionId2, WizardStep2], [IDL2.Bool], []),
-    "toggleItemSelection": IDL2.Func([SessionId2, ItemId2], [IDL2.Bool], []),
-    "updateItemProgress": IDL2.Func(
-      [JobId2, ItemId2, JobStatus2, IDL2.Nat, IDL2.Opt(IDL2.Text)],
-      [IDL2.Bool],
-      []
-    ),
-    "updateJobStatus": IDL2.Func([JobId2, JobStatus2], [IDL2.Bool], [])
-  });
-};
-function candid_some(value) {
-  return [
-    value
-  ];
-}
-function candid_none() {
-  return [];
-}
-function record_opt_to_undefined(arg) {
-  return arg == null ? void 0 : arg;
-}
-class Backend {
-  constructor(actor, _uploadFile, _downloadFile, processError2) {
-    this.actor = actor;
-    this._uploadFile = _uploadFile;
-    this._downloadFile = _downloadFile;
-    this.processError = processError2;
-  }
-  async addLogEntry(arg0, arg1) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.addLogEntry(arg0, to_candid_LogEntry_n1(this._uploadFile, this._downloadFile, arg1));
-        return result;
-      } catch (e) {
-        this.processError(e);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.addLogEntry(arg0, to_candid_LogEntry_n1(this._uploadFile, this._downloadFile, arg1));
-      return result;
-    }
-  }
-  async createSession() {
-    if (this.processError) {
-      try {
-        const result = await this.actor.createSession();
-        return result;
-      } catch (e) {
-        this.processError(e);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.createSession();
-      return result;
-    }
-  }
-  async createTransferJob(arg0) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.createTransferJob(arg0);
-        return from_candid_opt_n7(this._uploadFile, this._downloadFile, result);
-      } catch (e) {
-        this.processError(e);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.createTransferJob(arg0);
-      return from_candid_opt_n7(this._uploadFile, this._downloadFile, result);
-    }
-  }
-  async getScannedItems(arg0) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.getScannedItems(arg0);
-        return from_candid_vec_n8(this._uploadFile, this._downloadFile, result);
-      } catch (e) {
-        this.processError(e);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.getScannedItems(arg0);
-      return from_candid_vec_n8(this._uploadFile, this._downloadFile, result);
-    }
-  }
-  async getSession(arg0) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.getSession(arg0);
-        return from_candid_opt_n13(this._uploadFile, this._downloadFile, result);
-      } catch (e) {
-        this.processError(e);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.getSession(arg0);
-      return from_candid_opt_n13(this._uploadFile, this._downloadFile, result);
-    }
-  }
-  async getTransferJob(arg0) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.getTransferJob(arg0);
-        return from_candid_opt_n14(this._uploadFile, this._downloadFile, result);
-      } catch (e) {
-        this.processError(e);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.getTransferJob(arg0);
-      return from_candid_opt_n14(this._uploadFile, this._downloadFile, result);
-    }
-  }
-  async getTransferLogs(arg0) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.getTransferLogs(arg0);
-        return from_candid_vec_n23(this._uploadFile, this._downloadFile, result);
-      } catch (e) {
-        this.processError(e);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.getTransferLogs(arg0);
-      return from_candid_vec_n23(this._uploadFile, this._downloadFile, result);
-    }
-  }
-  async listTransferJobs(arg0) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.listTransferJobs(arg0);
-        return from_candid_vec_n27(this._uploadFile, this._downloadFile, result);
-      } catch (e) {
-        this.processError(e);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.listTransferJobs(arg0);
-      return from_candid_vec_n27(this._uploadFile, this._downloadFile, result);
-    }
-  }
-  async scanAccountA(arg0) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.scanAccountA(arg0);
-        return from_candid_vec_n8(this._uploadFile, this._downloadFile, result);
-      } catch (e) {
-        this.processError(e);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.scanAccountA(arg0);
-      return from_candid_vec_n8(this._uploadFile, this._downloadFile, result);
-    }
-  }
-  async selectAllItems(arg0, arg1) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.selectAllItems(arg0, arg1);
-        return result;
-      } catch (e) {
-        this.processError(e);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.selectAllItems(arg0, arg1);
-      return result;
-    }
-  }
-  async setAccountAAuth(arg0, arg1) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.setAccountAAuth(arg0, arg1);
-        return result;
-      } catch (e) {
-        this.processError(e);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.setAccountAAuth(arg0, arg1);
-      return result;
-    }
-  }
-  async setAccountBAuth(arg0, arg1) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.setAccountBAuth(arg0, arg1);
-        return result;
-      } catch (e) {
-        this.processError(e);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.setAccountBAuth(arg0, arg1);
-      return result;
-    }
-  }
-  async setWizardStep(arg0, arg1) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.setWizardStep(arg0, arg1);
-        return result;
-      } catch (e) {
-        this.processError(e);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.setWizardStep(arg0, arg1);
-      return result;
-    }
-  }
-  async toggleItemSelection(arg0, arg1) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.toggleItemSelection(arg0, arg1);
-        return result;
-      } catch (e) {
-        this.processError(e);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.toggleItemSelection(arg0, arg1);
-      return result;
-    }
-  }
-  async updateItemProgress(arg0, arg1, arg2, arg3, arg4) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.updateItemProgress(arg0, arg1, to_candid_JobStatus_n3(this._uploadFile, this._downloadFile, arg2), arg3, to_candid_opt_n28(this._uploadFile, this._downloadFile, arg4));
-        return result;
-      } catch (e) {
-        this.processError(e);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.updateItemProgress(arg0, arg1, to_candid_JobStatus_n3(this._uploadFile, this._downloadFile, arg2), arg3, to_candid_opt_n28(this._uploadFile, this._downloadFile, arg4));
-      return result;
-    }
-  }
-  async updateJobStatus(arg0, arg1) {
-    if (this.processError) {
-      try {
-        const result = await this.actor.updateJobStatus(arg0, to_candid_JobStatus_n3(this._uploadFile, this._downloadFile, arg1));
-        return result;
-      } catch (e) {
-        this.processError(e);
-        throw new Error("unreachable");
-      }
-    } else {
-      const result = await this.actor.updateJobStatus(arg0, to_candid_JobStatus_n3(this._uploadFile, this._downloadFile, arg1));
-      return result;
-    }
-  }
-}
-function from_candid_AccountItem_n9(_uploadFile, _downloadFile, value) {
-  return from_candid_record_n10(_uploadFile, _downloadFile, value);
-}
-function from_candid_ItemProgress_n20(_uploadFile, _downloadFile, value) {
-  return from_candid_record_n21(_uploadFile, _downloadFile, value);
-}
-function from_candid_ItemType_n11(_uploadFile, _downloadFile, value) {
-  return from_candid_variant_n12(_uploadFile, _downloadFile, value);
-}
-function from_candid_JobStatus_n17(_uploadFile, _downloadFile, value) {
-  return from_candid_variant_n18(_uploadFile, _downloadFile, value);
-}
-function from_candid_LogEntry_n24(_uploadFile, _downloadFile, value) {
-  return from_candid_record_n25(_uploadFile, _downloadFile, value);
-}
-function from_candid_TransferJob_n15(_uploadFile, _downloadFile, value) {
-  return from_candid_record_n16(_uploadFile, _downloadFile, value);
-}
-function from_candid_opt_n13(_uploadFile, _downloadFile, value) {
-  return value.length === 0 ? null : value[0];
-}
-function from_candid_opt_n14(_uploadFile, _downloadFile, value) {
-  return value.length === 0 ? null : from_candid_TransferJob_n15(_uploadFile, _downloadFile, value[0]);
-}
-function from_candid_opt_n22(_uploadFile, _downloadFile, value) {
-  return value.length === 0 ? null : value[0];
-}
-function from_candid_opt_n26(_uploadFile, _downloadFile, value) {
-  return value.length === 0 ? null : value[0];
-}
-function from_candid_opt_n7(_uploadFile, _downloadFile, value) {
-  return value.length === 0 ? null : value[0];
-}
-function from_candid_record_n10(_uploadFile, _downloadFile, value) {
-  return {
-    id: value.id,
-    name: value.name,
-    memberCount: value.memberCount,
-    itemType: from_candid_ItemType_n11(_uploadFile, _downloadFile, value.itemType),
-    selected: value.selected,
-    subscriberCount: value.subscriberCount
-  };
-}
-function from_candid_record_n16(_uploadFile, _downloadFile, value) {
-  return {
-    id: value.id,
-    status: from_candid_JobStatus_n17(_uploadFile, _downloadFile, value.status),
-    createdAt: value.createdAt,
-    updatedAt: value.updatedAt,
-    sessionId: value.sessionId,
-    items: from_candid_vec_n19(_uploadFile, _downloadFile, value.items)
-  };
-}
-function from_candid_record_n21(_uploadFile, _downloadFile, value) {
-  return {
-    status: from_candid_JobStatus_n17(_uploadFile, _downloadFile, value.status),
-    itemId: value.itemId,
-    errorMessage: record_opt_to_undefined(from_candid_opt_n22(_uploadFile, _downloadFile, value.errorMessage)),
-    itemName: value.itemName,
-    itemType: from_candid_ItemType_n11(_uploadFile, _downloadFile, value.itemType),
-    progressPct: value.progressPct
-  };
-}
-function from_candid_record_n25(_uploadFile, _downloadFile, value) {
-  return {
-    startTime: value.startTime,
-    status: from_candid_JobStatus_n17(_uploadFile, _downloadFile, value.status),
-    itemId: value.itemId,
-    endTime: record_opt_to_undefined(from_candid_opt_n26(_uploadFile, _downloadFile, value.endTime)),
-    errorMessage: record_opt_to_undefined(from_candid_opt_n22(_uploadFile, _downloadFile, value.errorMessage)),
-    itemName: value.itemName,
-    itemType: from_candid_ItemType_n11(_uploadFile, _downloadFile, value.itemType)
-  };
-}
-function from_candid_variant_n12(_uploadFile, _downloadFile, value) {
-  return "bot" in value ? "bot" : "chat" in value ? "chat" : "group" in value ? "group" : "channel" in value ? "channel" : "folder" in value ? "folder" : value;
-}
-function from_candid_variant_n18(_uploadFile, _downloadFile, value) {
-  return "pending" in value ? "pending" : "complete" in value ? "complete" : "failed" in value ? "failed" : "running" in value ? "running" : value;
-}
-function from_candid_vec_n19(_uploadFile, _downloadFile, value) {
-  return value.map((x3) => from_candid_ItemProgress_n20(_uploadFile, _downloadFile, x3));
-}
-function from_candid_vec_n23(_uploadFile, _downloadFile, value) {
-  return value.map((x3) => from_candid_LogEntry_n24(_uploadFile, _downloadFile, x3));
-}
-function from_candid_vec_n27(_uploadFile, _downloadFile, value) {
-  return value.map((x3) => from_candid_TransferJob_n15(_uploadFile, _downloadFile, x3));
-}
-function from_candid_vec_n8(_uploadFile, _downloadFile, value) {
-  return value.map((x3) => from_candid_AccountItem_n9(_uploadFile, _downloadFile, x3));
-}
-function to_candid_ItemType_n5(_uploadFile, _downloadFile, value) {
-  return to_candid_variant_n6(_uploadFile, _downloadFile, value);
-}
-function to_candid_JobStatus_n3(_uploadFile, _downloadFile, value) {
-  return to_candid_variant_n4(_uploadFile, _downloadFile, value);
-}
-function to_candid_LogEntry_n1(_uploadFile, _downloadFile, value) {
-  return to_candid_record_n2(_uploadFile, _downloadFile, value);
-}
-function to_candid_opt_n28(_uploadFile, _downloadFile, value) {
-  return value === null ? candid_none() : candid_some(value);
-}
-function to_candid_record_n2(_uploadFile, _downloadFile, value) {
-  return {
-    startTime: value.startTime,
-    status: to_candid_JobStatus_n3(_uploadFile, _downloadFile, value.status),
-    itemId: value.itemId,
-    endTime: value.endTime ? candid_some(value.endTime) : candid_none(),
-    errorMessage: value.errorMessage ? candid_some(value.errorMessage) : candid_none(),
-    itemName: value.itemName,
-    itemType: to_candid_ItemType_n5(_uploadFile, _downloadFile, value.itemType)
-  };
-}
-function to_candid_variant_n4(_uploadFile, _downloadFile, value) {
-  return value == "pending" ? {
-    pending: null
-  } : value == "complete" ? {
-    complete: null
-  } : value == "failed" ? {
-    failed: null
-  } : value == "running" ? {
-    running: null
-  } : value;
-}
-function to_candid_variant_n6(_uploadFile, _downloadFile, value) {
-  return value == "bot" ? {
-    bot: null
-  } : value == "chat" ? {
-    chat: null
-  } : value == "group" ? {
-    group: null
-  } : value == "channel" ? {
-    channel: null
-  } : value == "folder" ? {
-    folder: null
-  } : value;
-}
-function createActor(canisterId, _uploadFile, _downloadFile, options = {}) {
-  const agent = options.agent || HttpAgent.createSync({
-    ...options.agentOptions
-  });
-  if (options.agent && options.agentOptions) {
-    console.warn("Detected both agent and agentOptions passed to createActor. Ignoring agentOptions and proceeding with the provided agent.");
-  }
-  const actor = Actor.createActor(idlFactory, {
-    agent,
-    canisterId,
-    ...options.actorOptions
-  });
-  return new Backend(actor, _uploadFile, _downloadFile, options.processError);
 }
 const typeIcon$1 = {
   channel: Megaphone,

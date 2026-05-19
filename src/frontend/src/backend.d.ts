@@ -82,10 +82,27 @@ export interface backendInterface {
     listTransferJobs(sessionId: SessionId): Promise<Array<TransferJob>>;
     scanAccountA(sessionId: SessionId): Promise<Array<AccountItem>>;
     selectAllItems(sessionId: SessionId, selected: boolean): Promise<boolean>;
+    sendCode(sessionId: SessionId, phone: string, account: string): Promise<{
+        __kind__: "ok";
+        ok: null;
+    } | {
+        __kind__: "err";
+        err: string;
+    }>;
     setAccountAAuth(sessionId: SessionId, auth: AuthState): Promise<boolean>;
     setAccountBAuth(sessionId: SessionId, auth: AuthState): Promise<boolean>;
     setWizardStep(sessionId: SessionId, step: WizardStep): Promise<boolean>;
     toggleItemSelection(sessionId: SessionId, itemId: ItemId): Promise<boolean>;
     updateItemProgress(jobId: JobId, itemId: ItemId, status: JobStatus, progressPct: bigint, errorMessage: string | null): Promise<boolean>;
     updateJobStatus(jobId: JobId, status: JobStatus): Promise<boolean>;
+    verifyCode(sessionId: SessionId, phone: string, code: string, account: string): Promise<{
+        __kind__: "ok";
+        ok: {
+            username: string;
+            initials: string;
+        };
+    } | {
+        __kind__: "err";
+        err: string;
+    }>;
 }

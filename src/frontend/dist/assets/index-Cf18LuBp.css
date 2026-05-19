@@ -724,9 +724,6 @@ body{
 .mb-1\.5{
   margin-bottom: 0.375rem;
 }
-.mb-2{
-  margin-bottom: 0.5rem;
-}
 .ml-1{
   margin-left: 0.25rem;
 }
@@ -1042,8 +1039,8 @@ body{
 .max-w-\[130px\]{
   max-width: 130px;
 }
-.max-w-\[160px\]{
-  max-width: 160px;
+.max-w-\[220px\]{
+  max-width: 220px;
 }
 .max-w-\[calc\(100\%-2rem\)\]{
   max-width: calc(100% - 2rem);
@@ -2026,9 +2023,6 @@ body{
 }
 .opacity-100{
   opacity: 1;
-}
-.opacity-40{
-  opacity: 0.4;
 }
 .opacity-50{
   opacity: 0.5;

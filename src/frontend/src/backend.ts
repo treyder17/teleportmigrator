@@ -164,12 +164,29 @@ export interface backendInterface {
     listTransferJobs(sessionId: SessionId): Promise<Array<TransferJob>>;
     scanAccountA(sessionId: SessionId): Promise<Array<AccountItem>>;
     selectAllItems(sessionId: SessionId, selected: boolean): Promise<boolean>;
+    sendCode(sessionId: SessionId, phone: string, account: string): Promise<{
+        __kind__: "ok";
+        ok: null;
+    } | {
+        __kind__: "err";
+        err: string;
+    }>;
     setAccountAAuth(sessionId: SessionId, auth: AuthState): Promise<boolean>;
     setAccountBAuth(sessionId: SessionId, auth: AuthState): Promise<boolean>;
     setWizardStep(sessionId: SessionId, step: WizardStep): Promise<boolean>;
     toggleItemSelection(sessionId: SessionId, itemId: ItemId): Promise<boolean>;
     updateItemProgress(jobId: JobId, itemId: ItemId, status: JobStatus, progressPct: bigint, errorMessage: string | null): Promise<boolean>;
     updateJobStatus(jobId: JobId, status: JobStatus): Promise<boolean>;
+    verifyCode(sessionId: SessionId, phone: string, code: string, account: string): Promise<{
+        __kind__: "ok";
+        ok: {
+            username: string;
+            initials: string;
+        };
+    } | {
+        __kind__: "err";
+        err: string;
+    }>;
 }
 import type { AccountItem as _AccountItem, ItemId as _ItemId, ItemProgress as _ItemProgress, ItemType as _ItemType, JobId as _JobId, JobStatus as _JobStatus, LogEntry as _LogEntry, Session as _Session, SessionId as _SessionId, Timestamp as _Timestamp, TransferJob as _TransferJob } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
@@ -314,6 +331,26 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async sendCode(arg0: SessionId, arg1: string, arg2: string): Promise<{
+        __kind__: "ok";
+        ok: null;
+    } | {
+        __kind__: "err";
+        err: string;
+    }> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.sendCode(arg0, arg1, arg2);
+                return from_candid_variant_n28(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.sendCode(arg0, arg1, arg2);
+            return from_candid_variant_n28(this._uploadFile, this._downloadFile, result);
+        }
+    }
     async setAccountAAuth(arg0: SessionId, arg1: AuthState): Promise<boolean> {
         if (this.processError) {
             try {
@@ -373,14 +410,14 @@ export class Backend implements backendInterface {
     async updateItemProgress(arg0: JobId, arg1: ItemId, arg2: JobStatus, arg3: bigint, arg4: string | null): Promise<boolean> {
         if (this.processError) {
             try {
-                const result = await this.actor.updateItemProgress(arg0, arg1, to_candid_JobStatus_n3(this._uploadFile, this._downloadFile, arg2), arg3, to_candid_opt_n28(this._uploadFile, this._downloadFile, arg4));
+                const result = await this.actor.updateItemProgress(arg0, arg1, to_candid_JobStatus_n3(this._uploadFile, this._downloadFile, arg2), arg3, to_candid_opt_n29(this._uploadFile, this._downloadFile, arg4));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.updateItemProgress(arg0, arg1, to_candid_JobStatus_n3(this._uploadFile, this._downloadFile, arg2), arg3, to_candid_opt_n28(this._uploadFile, this._downloadFile, arg4));
+            const result = await this.actor.updateItemProgress(arg0, arg1, to_candid_JobStatus_n3(this._uploadFile, this._downloadFile, arg2), arg3, to_candid_opt_n29(this._uploadFile, this._downloadFile, arg4));
             return result;
         }
     }
@@ -396,6 +433,29 @@ export class Backend implements backendInterface {
         } else {
             const result = await this.actor.updateJobStatus(arg0, to_candid_JobStatus_n3(this._uploadFile, this._downloadFile, arg1));
             return result;
+        }
+    }
+    async verifyCode(arg0: SessionId, arg1: string, arg2: string, arg3: string): Promise<{
+        __kind__: "ok";
+        ok: {
+            username: string;
+            initials: string;
+        };
+    } | {
+        __kind__: "err";
+        err: string;
+    }> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.verifyCode(arg0, arg1, arg2, arg3);
+                return from_candid_variant_n30(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.verifyCode(arg0, arg1, arg2, arg3);
+            return from_candid_variant_n30(this._uploadFile, this._downloadFile, result);
         }
     }
 }
@@ -555,6 +615,50 @@ function from_candid_variant_n18(_uploadFile: (file: ExternalBlob) => Promise<Ui
 }): JobStatus {
     return "pending" in value ? JobStatus.pending : "complete" in value ? JobStatus.complete : "failed" in value ? JobStatus.failed : "running" in value ? JobStatus.running : value;
 }
+function from_candid_variant_n28(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    ok: null;
+} | {
+    err: string;
+}): {
+    __kind__: "ok";
+    ok: null;
+} | {
+    __kind__: "err";
+    err: string;
+} {
+    return "ok" in value ? {
+        __kind__: "ok",
+        ok: value.ok
+    } : "err" in value ? {
+        __kind__: "err",
+        err: value.err
+    } : value;
+}
+function from_candid_variant_n30(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    ok: {
+        username: string;
+        initials: string;
+    };
+} | {
+    err: string;
+}): {
+    __kind__: "ok";
+    ok: {
+        username: string;
+        initials: string;
+    };
+} | {
+    __kind__: "err";
+    err: string;
+} {
+    return "ok" in value ? {
+        __kind__: "ok",
+        ok: value.ok
+    } : "err" in value ? {
+        __kind__: "err",
+        err: value.err
+    } : value;
+}
 function from_candid_vec_n19(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_ItemProgress>): Array<ItemProgress> {
     return value.map((x)=>from_candid_ItemProgress_n20(_uploadFile, _downloadFile, x));
 }
@@ -576,7 +680,7 @@ function to_candid_JobStatus_n3(_uploadFile: (file: ExternalBlob) => Promise<Uin
 function to_candid_LogEntry_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: LogEntry): _LogEntry {
     return to_candid_record_n2(_uploadFile, _downloadFile, value);
 }
-function to_candid_opt_n28(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: string | null): [] | [string] {
+function to_candid_opt_n29(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: string | null): [] | [string] {
     return value === null ? candid_none() : candid_some(value);
 }
 function to_candid_record_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {

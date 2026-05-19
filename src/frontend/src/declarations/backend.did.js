@@ -84,6 +84,11 @@ export const idlService = IDL.Service({
   'listTransferJobs' : IDL.Func([SessionId], [IDL.Vec(TransferJob)], ['query']),
   'scanAccountA' : IDL.Func([SessionId], [IDL.Vec(AccountItem)], []),
   'selectAllItems' : IDL.Func([SessionId, IDL.Bool], [IDL.Bool], []),
+  'sendCode' : IDL.Func(
+      [SessionId, IDL.Text, IDL.Text],
+      [IDL.Variant({ 'ok' : IDL.Null, 'err' : IDL.Text })],
+      [],
+    ),
   'setAccountAAuth' : IDL.Func([SessionId, AuthState], [IDL.Bool], []),
   'setAccountBAuth' : IDL.Func([SessionId, AuthState], [IDL.Bool], []),
   'setWizardStep' : IDL.Func([SessionId, WizardStep], [IDL.Bool], []),
@@ -94,6 +99,16 @@ export const idlService = IDL.Service({
       [],
     ),
   'updateJobStatus' : IDL.Func([JobId, JobStatus], [IDL.Bool], []),
+  'verifyCode' : IDL.Func(
+      [SessionId, IDL.Text, IDL.Text, IDL.Text],
+      [
+        IDL.Variant({
+          'ok' : IDL.Record({ 'username' : IDL.Text, 'initials' : IDL.Text }),
+          'err' : IDL.Text,
+        }),
+      ],
+      [],
+    ),
 });
 
 export const idlInitArgs = [];
@@ -183,6 +198,11 @@ export const idlFactory = ({ IDL }) => {
       ),
     'scanAccountA' : IDL.Func([SessionId], [IDL.Vec(AccountItem)], []),
     'selectAllItems' : IDL.Func([SessionId, IDL.Bool], [IDL.Bool], []),
+    'sendCode' : IDL.Func(
+        [SessionId, IDL.Text, IDL.Text],
+        [IDL.Variant({ 'ok' : IDL.Null, 'err' : IDL.Text })],
+        [],
+      ),
     'setAccountAAuth' : IDL.Func([SessionId, AuthState], [IDL.Bool], []),
     'setAccountBAuth' : IDL.Func([SessionId, AuthState], [IDL.Bool], []),
     'setWizardStep' : IDL.Func([SessionId, WizardStep], [IDL.Bool], []),
@@ -193,6 +213,16 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'updateJobStatus' : IDL.Func([JobId, JobStatus], [IDL.Bool], []),
+    'verifyCode' : IDL.Func(
+        [SessionId, IDL.Text, IDL.Text, IDL.Text],
+        [
+          IDL.Variant({
+            'ok' : IDL.Record({ 'username' : IDL.Text, 'initials' : IDL.Text }),
+            'err' : IDL.Text,
+          }),
+        ],
+        [],
+      ),
   });
 };
 

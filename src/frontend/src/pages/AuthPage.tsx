@@ -1,97 +1,23 @@
+import { createActor } from "@/backend";
 import { useWizard } from "@/hooks/useWizard";
 import { cn } from "@/lib/utils";
 import type { AuthState } from "@/types";
+import { useActor } from "@caffeineai/core-infrastructure";
 import { useNavigate } from "@tanstack/react-router";
 import {
+  AlertCircle,
   ArrowRight,
   CheckCircle2,
   Phone,
   QrCode,
-  RefreshCw,
   Shield,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { SiTelegram } from "react-icons/si";
 import { toast } from "sonner";
 
 type AccountSlot = "A" | "B";
 type AuthMethod = "phone" | "qr";
-
-// Mock user profiles per slot
-const MOCK_PROFILES: Record<AccountSlot, { name: string; handle: string }> = {
-  A: { name: "John Doe", handle: "@johndoe" },
-  B: { name: "Jane Smith", handle: "@janesmith" },
-};
-
-/** Generates a deterministic-looking QR-style grid from a seed */
-function QrMockCanvas({ seed }: { seed: string }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const size = 120;
-    const cells = 20;
-    const cell = size / cells;
-    canvas.width = size;
-    canvas.height = size;
-
-    // Simple seeded pseudo-random from string hash
-    let hash = 0;
-    for (let i = 0; i < seed.length; i++) {
-      hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
-    }
-    const rand = () => {
-      hash = (hash * 1664525 + 1013904223) >>> 0;
-      return hash / 0xffffffff;
-    };
-
-    ctx.fillStyle = "#0d1117";
-    ctx.fillRect(0, 0, size, size);
-
-    ctx.fillStyle = "#5bcefa";
-
-    for (let row = 0; row < cells; row++) {
-      for (let col = 0; col < cells; col++) {
-        // Force corner finder patterns (top-left, top-right, bottom-left)
-        const inTopLeft = row < 7 && col < 7;
-        const inTopRight = row < 7 && col >= cells - 7;
-        const inBottomLeft = row >= cells - 7 && col < 7;
-        let filled = false;
-
-        if (inTopLeft || inTopRight || inBottomLeft) {
-          const r = inTopLeft ? row : inTopRight ? row : row - (cells - 7);
-          const c = inTopLeft ? col : inTopRight ? col - (cells - 7) : col;
-          filled =
-            r === 0 ||
-            r === 6 ||
-            c === 0 ||
-            c === 6 ||
-            (r >= 2 && r <= 4 && c >= 2 && c <= 4);
-        } else {
-          filled = rand() > 0.55;
-        }
-
-        if (filled) {
-          ctx.fillRect(col * cell, row * cell, cell - 0.5, cell - 0.5);
-        }
-      }
-    }
-  }, [seed]);
-
-  return (
-    <canvas
-      ref={canvasRef}
-      width={120}
-      height={120}
-      className="rounded-sm"
-      style={{ imageRendering: "pixelated" }}
-    />
-  );
-}
 
 interface AccountAuthFormProps {
   slot: AccountSlot;
@@ -108,43 +34,59 @@ function AccountAuthForm({
   auth,
   onVerified,
 }: AccountAuthFormProps) {
+  const { session } = useWizard();
+  const { actor } = useActor(createActor);
   const [method, setMethod] = useState<AuthMethod>("phone");
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
   const [step, setStep] = useState<"input" | "verify">("input");
   const [loading, setLoading] = useState(false);
-  const [qrSeed] = useState(() => `${slot}-${Date.now()}`);
-  const [qrExpired, setQrExpired] = useState(false);
-  const qrTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
+  const sessionId = session.id;
   const isVerified = auth?.status === "verified";
-  const profile = MOCK_PROFILES[slot];
-  const initials = profile.name
-    .split(" ")
-    .map((n) => n[0])
-    .join("");
-
-  // QR auto-expire simulation
-  useEffect(() => {
-    if (method === "qr" && !isVerified) {
-      setQrExpired(false);
-      qrTimerRef.current = setTimeout(() => setQrExpired(true), 30000);
-    }
-    return () => {
-      if (qrTimerRef.current) clearTimeout(qrTimerRef.current);
-    };
-  }, [method, isVerified]);
+  const displayName = auth?.username ?? auth?.phone ?? "";
+  const displayInitials =
+    auth?.initials ??
+    (displayName ? displayName.slice(0, 2).toUpperCase() : slot);
 
   const handleSendCode = async () => {
     if (!phone.trim()) {
       toast.error("Enter a phone number");
       return;
     }
+    if (!actor) {
+      toast.error("Backend not ready. Please try again.");
+      return;
+    }
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1200));
-    setLoading(false);
-    setStep("verify");
-    toast.success(`Code sent to ${phone}`);
+    setError(null);
+    try {
+      const res = await (
+        actor as {
+          sendCode: (
+            sessionId: string,
+            phone: string,
+            account: string,
+          ) => Promise<
+            { __kind__: "ok"; ok: null } | { __kind__: "err"; err: string }
+          >;
+        }
+      ).sendCode(sessionId, phone, slot);
+      if (res.__kind__ === "err") {
+        setError(res.err);
+        toast.error(res.err);
+        return;
+      }
+      setStep("verify");
+      toast.success(`Code sent to ${phone}`);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Failed to send code";
+      setError(msg);
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleVerify = async () => {
@@ -152,23 +94,47 @@ function AccountAuthForm({
       toast.error("Enter the verification code");
       return;
     }
+    if (!actor) {
+      toast.error("Backend not ready. Please try again.");
+      return;
+    }
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    setLoading(false);
-    onVerified({ phone, sessionHash: crypto.randomUUID(), status: "verified" });
-    toast.success(`Account ${slot} authenticated as ${profile.name}`);
-  };
-
-  const handleQrLogin = async () => {
-    setLoading(true);
-    await new Promise((r) => setTimeout(r, 1500));
-    setLoading(false);
-    onVerified({
-      phone: profile.handle,
-      sessionHash: crypto.randomUUID(),
-      status: "verified",
-    });
-    toast.success(`Account ${slot} authenticated via QR as ${profile.name}`);
+    setError(null);
+    try {
+      const res = await (
+        actor as {
+          verifyCode: (
+            sessionId: string,
+            phone: string,
+            code: string,
+            account: string,
+          ) => Promise<
+            | { __kind__: "ok"; ok: { username: string; initials: string } }
+            | { __kind__: "err"; err: string }
+          >;
+        }
+      ).verifyCode(sessionId, phone, code, slot);
+      if (res.__kind__ === "err") {
+        setError(res.err);
+        toast.error(res.err);
+        return;
+      }
+      const { username, initials } = res.ok;
+      onVerified({
+        phone,
+        sessionHash: crypto.randomUUID(),
+        status: "verified",
+        username,
+        initials,
+      });
+      toast.success(`Account ${slot} authenticated as ${username}`);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Verification failed";
+      setError(msg);
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -225,11 +191,11 @@ function AccountAuthForm({
         {isVerified ? (
           <div className="rounded-lg bg-primary/8 border border-primary/20 p-3 flex items-center gap-3">
             <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-primary/20 text-primary font-display font-semibold text-sm">
-              {initials}
+              {displayInitials}
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-medium text-foreground truncate">
-                {profile.name}
+                {displayName || auth?.phone}
               </p>
               <p className="text-xs text-muted-foreground font-mono truncate">
                 {auth?.phone}
@@ -270,53 +236,29 @@ function AccountAuthForm({
               ))}
             </div>
 
-            {/* QR panel */}
+            {/* QR panel — disabled */}
             {method === "qr" ? (
-              <div className="rounded-lg bg-background border border-border p-4 flex flex-col items-center gap-3">
-                <div className="relative">
-                  <div
-                    className={cn(
-                      "p-2 rounded-lg border-2 transition-smooth",
-                      qrExpired
-                        ? "border-destructive/40 opacity-40"
-                        : "border-primary/30 bg-muted/20",
-                    )}
-                  >
-                    <QrMockCanvas seed={qrSeed} />
-                  </div>
-                  {qrExpired && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/80 rounded-lg">
-                      <p className="text-xs text-muted-foreground mb-2">
-                        QR Expired
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => setQrExpired(false)}
-                        className="flex items-center gap-1 text-xs text-primary hover:opacity-80 transition-colors-fast"
-                      >
-                        <RefreshCw className="w-3 h-3" />
-                        Refresh
-                      </button>
-                    </div>
-                  )}
+              <div className="rounded-lg bg-muted/20 border border-border p-4 flex flex-col items-center gap-3 text-center">
+                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                  <AlertCircle className="w-5 h-5 text-muted-foreground" />
                 </div>
-                <p className="text-xs text-muted-foreground text-center max-w-[160px]">
-                  Open Telegram → Settings → Devices → Scan QR
-                </p>
-                {!qrExpired && (
-                  <button
-                    type="button"
-                    disabled={loading}
-                    onClick={handleQrLogin}
-                    data-ocid={`auth.account-${slot.toLowerCase()}.qr_confirm_button`}
-                    className={cn(
-                      "w-full rounded-lg bg-primary/15 border border-primary/30 text-primary text-xs font-medium py-1.5 transition-smooth",
-                      "hover:bg-primary/25 disabled:opacity-50 disabled:cursor-not-allowed",
-                    )}
-                  >
-                    {loading ? "Authenticating…" : "Simulate QR Scan"}
-                  </button>
-                )}
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-foreground">
+                    QR Code Not Supported
+                  </p>
+                  <p className="text-xs text-muted-foreground leading-relaxed max-w-[220px]">
+                    QR Code authentication is not currently supported. Please
+                    use Phone Number login instead.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setMethod("phone")}
+                  data-ocid={`auth.account-${slot.toLowerCase()}.qr_switch_button`}
+                  className="text-xs text-primary hover:opacity-80 transition-colors-fast underline"
+                >
+                  Switch to Phone Login
+                </button>
               </div>
             ) : step === "input" ? (
               /* Phone input */
@@ -352,6 +294,12 @@ function AccountAuthForm({
                     "Send Verification Code"
                   )}
                 </button>
+                {error && (
+                  <p className="text-xs text-destructive flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3 shrink-0" />
+                    {error}
+                  </p>
+                )}
               </div>
             ) : (
               /* Verify code */
@@ -398,6 +346,12 @@ function AccountAuthForm({
                     "Verify & Connect"
                   )}
                 </button>
+                {error && (
+                  <p className="text-xs text-destructive flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3 shrink-0" />
+                    {error}
+                  </p>
+                )}
               </div>
             )}
           </div>
@@ -476,7 +430,13 @@ export function AuthPage() {
               {verified ? (
                 <>
                   <CheckCircle2 className="w-3 h-3 shrink-0" />
-                  <span className="truncate">{MOCK_PROFILES[slot].name}</span>
+                  <span className="truncate">
+                    {slot === "A"
+                      ? (session.accountAAuth?.username ??
+                        session.accountAAuth?.phone)
+                      : (session.accountBAuth?.username ??
+                        session.accountBAuth?.phone)}
+                  </span>
                 </>
               ) : (
                 <span className="truncate">Account {slot} — Not connected</span>

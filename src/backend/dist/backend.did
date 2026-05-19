@@ -81,6 +81,11 @@ service : {
   listTransferJobs: (sessionId: SessionId) -> (vec TransferJob) query;
   scanAccountA: (sessionId: SessionId) -> (vec AccountItem);
   selectAllItems: (sessionId: SessionId, selected: bool) -> (bool);
+  sendCode: (sessionId: SessionId, phone: text, account: text) ->
+   (variant {
+      err: text;
+      ok;
+    });
   setAccountAAuth: (sessionId: SessionId, auth: AuthState) -> (bool);
   setAccountBAuth: (sessionId: SessionId, auth: AuthState) -> (bool);
   setWizardStep: (sessionId: SessionId, step: WizardStep) -> (bool);
@@ -88,4 +93,13 @@ service : {
   updateItemProgress: (jobId: JobId, itemId: ItemId, status: JobStatus,
    progressPct: nat, errorMessage: opt text) -> (bool);
   updateJobStatus: (jobId: JobId, status: JobStatus) -> (bool);
+  verifyCode: (sessionId: SessionId, phone: text, code: text, account:
+   text) ->
+   (variant {
+      err: text;
+      ok: record {
+            initials: text;
+            username: text;
+          };
+    });
 }

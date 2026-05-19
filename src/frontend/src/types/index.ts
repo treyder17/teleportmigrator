@@ -25,6 +25,8 @@ export interface AuthState {
   sessionHash: string;
   status: AuthStatus;
   error?: string;
+  username?: string;
+  initials?: string;
 }
 
 // Scanned account items

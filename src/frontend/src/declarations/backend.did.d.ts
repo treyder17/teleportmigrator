@@ -81,6 +81,11 @@ export interface _SERVICE {
   'listTransferJobs' : ActorMethod<[SessionId], Array<TransferJob>>,
   'scanAccountA' : ActorMethod<[SessionId], Array<AccountItem>>,
   'selectAllItems' : ActorMethod<[SessionId, boolean], boolean>,
+  'sendCode' : ActorMethod<
+    [SessionId, string, string],
+    { 'ok' : null } |
+      { 'err' : string }
+  >,
   'setAccountAAuth' : ActorMethod<[SessionId, AuthState], boolean>,
   'setAccountBAuth' : ActorMethod<[SessionId, AuthState], boolean>,
   'setWizardStep' : ActorMethod<[SessionId, WizardStep], boolean>,
@@ -90,6 +95,11 @@ export interface _SERVICE {
     boolean
   >,
   'updateJobStatus' : ActorMethod<[JobId, JobStatus], boolean>,
+  'verifyCode' : ActorMethod<
+    [SessionId, string, string, string],
+    { 'ok' : { 'username' : string, 'initials' : string } } |
+      { 'err' : string }
+  >,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];
